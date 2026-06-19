@@ -47,11 +47,7 @@ def add():
 def profile(customer_id):
     db = get_db()
     customer = db.execute('SELECT * FROM customers WHERE customer_id = ?', (customer_id,)).fetchone()
-    bills = db.execute(
-        'SELECT * FROM bills WHERE customer_id = ? ORDER BY date DESC', (customer_id,)
-    ).fetchall()
-    prescriptions = db.execute(
-        'SELECT * FROM prescriptions WHERE customer_id = ? ORDER BY date DESC', (customer_id,)
-    ).fetchall()
+    bills = db.execute('SELECT * FROM bills WHERE customer_id = ? ORDER BY date DESC', (customer_id,)).fetchall()
+    prescriptions = db.execute('SELECT * FROM prescriptions WHERE customer_id = ? ORDER BY date DESC', (customer_id,)).fetchall()
     db.close()
     return render_template('customers/profile.html', customer=customer, bills=bills, prescriptions=prescriptions)

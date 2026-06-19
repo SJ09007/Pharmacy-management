@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash
 from ..database import get_db
 from ..utils.auth import admin_required, login_required
 
@@ -10,8 +10,7 @@ def index():
     query = request.args.get('q', '')
     category = request.args.get('category', '')
     db = get_db()
-    sql = '''SELECT m.*, 
-             COALESCE(SUM(b.quantity),0) as total_stock
+    sql = '''SELECT m.*, COALESCE(SUM(b.quantity),0) as total_stock
              FROM medicines m
              LEFT JOIN batches b ON m.medicine_id = b.medicine_id AND b.quantity > 0
              WHERE 1=1'''

@@ -1,14 +1,13 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from ..database import get_db
 from ..utils.auth import login_required
-import datetime, json
+import datetime
 
 billing_bp = Blueprint('billing', __name__, url_prefix='/billing')
 
 GST_RATE = 0.18
 
 def deduct_fefo(db, medicine_id, quantity_needed):
-    """Deduct stock using FEFO (First Expiry First Out). Returns False if insufficient stock."""
     batches = db.execute(
         'SELECT * FROM batches WHERE medicine_id = ? AND quantity > 0 ORDER BY expiry_date ASC',
         (medicine_id,)
@@ -61,7 +60,7 @@ def new_bill():
                 return render_template('billing/new_bill.html', customers=customers, medicines=medicines)
             unit_price = med['mrp'] * (1 - med['discount_percentage'] / 100)
             subtotal += unit_price * qty
-            bill_items.append({'medicine_id': mid, 'quantity': qty, 'unit_price': round(unit_price, 2), 'name': med['medicine_name']})
+            bill_items.append({'medicine_id': mid, 'quantity': qty, 'unit_price': round(unit_price, 2)})
 
         gst = round(subtotal * GST_RATE, 2)
         final_amount = round(subtotal + gst, 2)
@@ -110,7 +109,4 @@ def bill_json(bill_id):
     bill = db.execute('SELECT * FROM bills WHERE bill_id=?', (bill_id,)).fetchone()
     items = db.execute('SELECT * FROM bill_items WHERE bill_id=?', (bill_id,)).fetchall()
     db.close()
-    return jsonify({
-        'bill': dict(bill),
-        'items': [dict(i) for i in items]
-    })
+    return jsonify({'bill': dict(bill), 'items': [dict(i) for i in items]})
