@@ -1,0 +1,28 @@
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+
+# Flask session files
+flask_session/
+
+# Database (remove if you want to commit it for demo)
+# pharmacy.db
+
+# Uploads
+uploads/
+
+# Virtual env
+venv/
+env/
+
+# IDE
+.vscode/
+.kiro/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Misc
+basics.txt
