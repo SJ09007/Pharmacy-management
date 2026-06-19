@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h4 class="mb-4"><i class="bi bi-speedometer2"></i> Analytics Dashboard</h4>
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body"><h6>Total Sales</h6><h2>{{ total_sales }}</h2></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body"><h6>Total Revenue</h6><h2>₹{{ "%.2f"|format(total_revenue) }}</h2></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body"><h6>Total Customers</h6><h2>{{ total_customers }}</h2></div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-danger text-white">
+            <div class="card-body"><h6>Low Stock Alerts</h6><h2>{{ low_stock|length }}</h2></div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card"><div class="card-body">
+            <h6 class="card-title">Daily Revenue (Last 30 Days)</h6>
+            <canvas id="dailyChart" height="200"></canvas>
+        </div></div>
+    </div>
+    <div class="col-md-6">
+        <div class="card"><div class="card-body">
+            <h6 class="card-title">Monthly Revenue</h6>
+            <canvas id="monthlyChart" height="200"></canvas>
+        </div></div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card"><div class="card-body">
+            <h6 class="card-title">Top Selling Medicines</h6>
+            <canvas id="topMedChart" height="200"></canvas>
+        </div></div>
+    </div>
+    <div class="col-md-6">
+        <div class="card"><div class="card-body">
+            <h6 class="card-title text-danger"><i class="bi bi-exclamation-triangle"></i> Low Stock Medicines</h6>
+            {% if low_stock %}
+            <table class="table table-sm table-striped">
+                <thead><tr><th>Medicine</th><th>Stock</th><th>Threshold</th></tr></thead>
+                <tbody>
+                {% for m in low_stock %}
+                <tr><td>{{ m.medicine_name }}</td><td class="text-danger fw-bold">{{ m.stock }}</td><td>{{ m.low_stock_threshold }}</td></tr>
+                {% endfor %}
+                </tbody>
+            </table>
+            {% else %}<p class="text-success">All medicines are sufficiently stocked.</p>{% endif %}
+        </div></div>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-body">
+        <h6 class="card-title"><i class="bi bi-calendar-x text-warning"></i> Expiry Dashboard</h6>
+        <ul class="nav nav-tabs" id="expiryTab">
+            <li class="nav-item"><button class="nav-link active" data-bs-toggle="tab" data-bs-target="#exp30">Expiring in 30 days ({{ expiry_30|length }})</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#exp60">31-60 days ({{ expiry_60|length }})</button></li>
+            <li class="nav-item"><button class="nav-link" data-bs-toggle="tab" data-bs-target="#exp90">61-90 days ({{ expiry_90|length }})</button></li>
+        </ul>
+        <div class="tab-content pt-2">
+            {% for group, items in [('exp30', expiry_30), ('exp60', expiry_60), ('exp90', expiry_90)] %}
+            <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="{{ group }}">
+                {% if items %}
+                <table class="table table-sm">
+                    <thead><tr><th>Medicine</th><th>Batch</th><th>Expiry Date</th></tr></thead>
+                    <tbody>
+                    {% for item in items %}
+                    <tr><td>{{ item.medicine_name }}</td><td>{{ item.batch_no }}</td><td>{{ item.expiry_date }}</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}<p class="text-muted">No medicines expiring in this range.</p>{% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+async function loadChart(url, canvasId, label, color) {
+    const res = await fetch(url);
+    const data = await res.json();
+    new Chart(document.getElementById(canvasId), {
+        type: 'bar',
+        data: { labels: data.labels, datasets: [{ label, data: data.data, backgroundColor: color }] },
+        options: { responsive: true, plugins: { legend: { display: false } } }
+    });
+}
+loadChart('/api/revenue/daily', 'dailyChart', 'Revenue (₹)', 'rgba(13,110,253,0.7)');
+loadChart('/api/revenue/monthly', 'monthlyChart', 'Revenue (₹)', 'rgba(25,135,84,0.7)');
+loadChart('/api/top-medicines', 'topMedChart', 'Units Sold', 'rgba(255,193,7,0.8)');
+</script>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}{{ customer.name }} - Profile{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4><i class="bi bi-person-circle"></i> {{ customer.name }}</h4>
+    <div>
+        <a href="{{ url_for('prescriptions.upload', customer_id=customer.customer_id) }}" class="btn btn-outline-secondary btn-sm">Upload Prescription</a>
+        <a href="{{ url_for('billing.new_bill') }}" class="btn btn-success btn-sm">New Bill</a>
+    </div>
+</div>
+<p><strong>Phone:</strong> {{ customer.phone }} &nbsp; <strong>Email:</strong> {{ customer.email or '-' }}</p>
+
+<div class="row mt-3">
+<div class="col-md-7">
+    <h6>Purchase History</h6>
+    <table class="table table-sm table-hover">
+        <thead class="table-dark"><tr><th>Bill ID</th><th>Date</th><th>Total</th><th></th></tr></thead>
+        <tbody>
+        {% for bill in bills %}
+        <tr>
+            <td>#{{ bill.bill_id }}</td>
+            <td>{{ bill.date }}</td>
+            <td>₹{{ "%.2f"|format(bill.final_amount) }}</td>
+            <td><a href="{{ url_for('billing.view_bill', bill_id=bill.bill_id) }}" class="btn btn-outline-primary btn-sm">View</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="4" class="text-muted">No bills yet.</td></tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
+<div class="col-md-5">
+    <h6>Prescriptions</h6>
+    {% for rx in prescriptions %}
+    <div class="card mb-2">
+        <div class="card-body p-2">
+            <small class="text-muted">{{ rx.date }}</small><br>
+            {% if rx.image_path.endswith('.pdf') %}
+            <a href="/{{ rx.image_path }}" target="_blank" class="btn btn-sm btn-outline-secondary mt-1"><i class="bi bi-file-pdf"></i> View PDF</a>
+            {% else %}
+            <img src="/{{ rx.image_path }}" class="img-thumbnail mt-1" style="max-height:100px;">
+            {% endif %}
+        </div>
+    </div>
+    {% else %}
+    <p class="text-muted">No prescriptions uploaded.</p>
+    {% endfor %}
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block title %}Bill #{{ bill.bill_id }}{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-md-7">
+<div class="card shadow-sm" id="printable">
+    <div class="card-body">
+        <div class="d-flex justify-content-between mb-3">
+            <div>
+                <h4><i class="bi bi-capsule"></i> SmartPharmacy</h4>
+                <small class="text-muted">Tax Invoice</small>
+            </div>
+            <div class="text-end">
+                <strong>Bill #{{ bill.bill_id }}</strong><br>
+                <small>{{ bill.date }}</small>
+            </div>
+        </div>
+        <p><strong>Customer:</strong> {{ bill.customer_name }} &nbsp; <strong>Phone:</strong> {{ bill.phone }}</p>
+        <table class="table table-sm table-bordered">
+            <thead class="table-dark"><tr><th>Medicine</th><th>Qty</th><th>Unit Price</th><th>Amount</th></tr></thead>
+            <tbody>
+            {% for item in items %}
+            <tr>
+                <td>{{ item.medicine_name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>₹{{ "%.2f"|format(item.unit_price) }}</td>
+                <td>₹{{ "%.2f"|format(item.unit_price * item.quantity) }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+            <tfoot>
+                <tr><td colspan="3" class="text-end">Subtotal</td><td>₹{{ "%.2f"|format(bill.subtotal) }}</td></tr>
+                <tr><td colspan="3" class="text-end">GST (18%)</td><td>₹{{ "%.2f"|format(bill.gst) }}</td></tr>
+                <tr class="fw-bold"><td colspan="3" class="text-end">Total</td><td>₹{{ "%.2f"|format(bill.final_amount) }}</td></tr>
+            </tfoot>
+        </table>
+        <p class="text-muted text-center small mt-2">Thank you for your purchase!</p>
+    </div>
+</div>
+<div class="mt-2">
+    <button onclick="window.print()" class="btn btn-outline-secondary btn-sm"><i class="bi bi-printer"></i> Print</button>
+    <a href="{{ url_for('billing.bill_json', bill_id=bill.bill_id) }}" class="btn btn-outline-info btn-sm" target="_blank">JSON</a>
+    <a href="{{ url_for('customers.index') }}" class="btn btn-secondary btn-sm">Back</a>
+</div>
+</div>
+</div>
+{% endblock %}

@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block title %}Customers{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4><i class="bi bi-people"></i> Customers</h4>
+    <a href="{{ url_for('customers.add') }}" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> Add Customer</a>
+</div>
+<form class="row g-2 mb-3" method="GET">
+    <div class="col-md-5">
+        <input type="text" name="q" class="form-control form-control-sm" placeholder="Search by name or phone..." value="{{ query }}">
+    </div>
+    <div class="col-auto"><button type="submit" class="btn btn-secondary btn-sm">Search</button></div>
+</form>
+<table class="table table-hover table-sm">
+    <thead class="table-dark"><tr><th>ID</th><th>Name</th><th>Phone</th><th>Email</th><th>Actions</th></tr></thead>
+    <tbody>
+    {% for c in customers %}
+    <tr>
+        <td>{{ c.customer_id }}</td>
+        <td>{{ c.name }}</td>
+        <td>{{ c.phone }}</td>
+        <td>{{ c.email or '-' }}</td>
+        <td>
+            <a href="{{ url_for('customers.profile', customer_id=c.customer_id) }}" class="btn btn-outline-primary btn-sm">Profile</a>
+            <a href="{{ url_for('prescriptions.upload', customer_id=c.customer_id) }}" class="btn btn-outline-secondary btn-sm">Upload Rx</a>
+            <a href="{{ url_for('billing.new_bill') }}?customer_id={{ c.customer_id }}" class="btn btn-outline-success btn-sm">New Bill</a>
+        </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="5" class="text-center text-muted">No customers found.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% block title %}New Bill{% endblock %}
+{% block content %}
+<h4><i class="bi bi-receipt"></i> Generate Bill</h4>
+<form method="POST" id="billForm">
+    <div class="row mb-3">
+        <div class="col-md-4">
+            <label class="form-label">Customer *</label>
+            <select name="customer_id" class="form-select" required>
+                <option value="">-- Select Customer --</option>
+                {% for c in customers %}
+                <option value="{{ c.customer_id }}" {% if request.args.get('customer_id')|string == c.customer_id|string %}selected{% endif %}>{{ c.name }} ({{ c.phone }})</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <div id="items-container">
+        <div class="row g-2 align-items-end mb-2 item-row">
+            <div class="col-md-5">
+                <label class="form-label">Medicine</label>
+                <select name="medicine_id[]" class="form-select med-select" required>
+                    <option value="">-- Select --</option>
+                    {% for m in medicines %}
+                    <option value="{{ m.medicine_id }}" data-mrp="{{ m.mrp }}" data-discount="{{ m.discount_percentage }}" data-stock="{{ m.stock }}">
+                        {{ m.medicine_name }} (Stock: {{ m.stock }}, MRP: ₹{{ m.mrp }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Qty</label>
+                <input type="number" name="quantity[]" class="form-control qty-input" min="1" value="1" required>
+            </div>
+            <div class="col-md-2">
+                <label class="form-label">Unit Price</label>
+                <input type="text" class="form-control unit-price-display" readonly placeholder="--">
+            </div>
+            <div class="col-md-auto">
+                <button type="button" class="btn btn-outline-danger btn-sm remove-row">Remove</button>
+            </div>
+        </div>
+    </div>
+    <button type="button" id="add-item" class="btn btn-outline-primary btn-sm mb-3"><i class="bi bi-plus"></i> Add Medicine</button>
+
+    <div class="card bg-light p-3 mb-3" style="max-width:300px">
+        <div class="d-flex justify-content-between"><span>Subtotal:</span><span id="subtotal">₹0.00</span></div>
+        <div class="d-flex justify-content-between"><span>GST (18%):</span><span id="gst">₹0.00</span></div>
+        <div class="d-flex justify-content-between fw-bold"><span>Total:</span><span id="total">₹0.00</span></div>
+    </div>
+
+    <button type="submit" class="btn btn-success"><i class="bi bi-check-circle"></i> Generate Bill</button>
+    <a href="{{ url_for('customers.index') }}" class="btn btn-secondary">Cancel</a>
+</form>
+{% endblock %}
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/billing.js') }}"></script>
+{% endblock %}

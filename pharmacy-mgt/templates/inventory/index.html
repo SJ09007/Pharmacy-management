@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}Inventory{% endblock %}
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <h4><i class="bi bi-box-seam"></i> Medicine Inventory</h4>
+    {% if session.role == 'admin' %}
+    <a href="{{ url_for('inventory.add') }}" class="btn btn-primary btn-sm"><i class="bi bi-plus"></i> Add Medicine</a>
+    {% endif %}
+</div>
+<form class="row g-2 mb-3" method="GET">
+    <div class="col-md-5">
+        <input type="text" name="q" class="form-control form-control-sm" placeholder="Search by name or category..." value="{{ query }}">
+    </div>
+    <div class="col-md-3">
+        <select name="category" class="form-select form-select-sm">
+            <option value="">All Categories</option>
+            {% for c in categories %}<option value="{{ c.category }}" {% if request.args.get('category')==c.category %}selected{% endif %}>{{ c.category }}</option>{% endfor %}
+        </select>
+    </div>
+    <div class="col-auto"><button type="submit" class="btn btn-secondary btn-sm">Search</button></div>
+</form>
+<div class="table-responsive">
+<table class="table table-hover table-sm align-middle">
+    <thead class="table-dark">
+        <tr><th>Name</th><th>Manufacturer</th><th>Category</th><th>MRP</th><th>Discount</th><th>Stock</th><th>Status</th><th>Actions</th></tr>
+    </thead>
+    <tbody>
+    {% for m in medicines %}
+    <tr>
+        <td>{{ m.medicine_name }}</td>
+        <td>{{ m.manufacturer or '-' }}</td>
+        <td>{{ m.category or '-' }}</td>
+        <td>₹{{ m.mrp }}</td>
+        <td>{{ m.discount_percentage }}%</td>
+        <td>{{ m.total_stock }}</td>
+        <td>
+            {% if m.total_stock < m.low_stock_threshold %}
+            <span class="badge bg-danger"><i class="bi bi-exclamation-triangle"></i> Restock Needed</span>
+            {% else %}
+            <span class="badge bg-success">OK</span>
+            {% endif %}
+        </td>
+        <td>
+            {% if session.role == 'admin' %}
+            <a href="{{ url_for('inventory.batches', medicine_id=m.medicine_id) }}" class="btn btn-outline-info btn-sm">Batches</a>
+            <a href="{{ url_for('inventory.edit', medicine_id=m.medicine_id) }}" class="btn btn-outline-warning btn-sm">Edit</a>
+            <form method="POST" action="{{ url_for('inventory.delete', medicine_id=m.medicine_id) }}" class="d-inline" onsubmit="return confirm('Delete this medicine?')">
+                <button type="submit" class="btn btn-outline-danger btn-sm">Delete</button>
+            </form>
+            {% endif %}
+        </td>
+    </tr>
+    {% else %}
+    <tr><td colspan="8" class="text-center text-muted">No medicines found.</td></tr>
+    {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endblock %}

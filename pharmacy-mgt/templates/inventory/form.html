@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %}{{ action }} Medicine{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-md-6">
+<div class="card shadow-sm">
+<div class="card-body">
+    <h5 class="card-title">{{ action }} Medicine</h5>
+    <form method="POST">
+        <div class="mb-3">
+            <label class="form-label">Medicine Name *</label>
+            <input type="text" name="medicine_name" class="form-control" value="{{ medicine.medicine_name if medicine else '' }}" required>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Manufacturer</label>
+            <input type="text" name="manufacturer" class="form-control" value="{{ medicine.manufacturer if medicine else '' }}">
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Category</label>
+            <input type="text" name="category" class="form-control" value="{{ medicine.category if medicine else '' }}">
+        </div>
+        <div class="row">
+            <div class="col mb-3">
+                <label class="form-label">MRP (₹) *</label>
+                <input type="number" step="0.01" name="mrp" class="form-control" value="{{ medicine.mrp if medicine else '' }}" required>
+            </div>
+            <div class="col mb-3">
+                <label class="form-label">Discount (%)</label>
+                <input type="number" step="0.01" name="discount_percentage" class="form-control" value="{{ medicine.discount_percentage if medicine else '0' }}">
+            </div>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Low Stock Threshold</label>
+            <input type="number" name="low_stock_threshold" class="form-control" value="{{ medicine.low_stock_threshold if medicine else '10' }}">
+        </div>
+        <button type="submit" class="btn btn-primary">{{ action }}</button>
+        <a href="{{ url_for('inventory.index') }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+</div>
+</div>
+</div>
+{% endblock %}

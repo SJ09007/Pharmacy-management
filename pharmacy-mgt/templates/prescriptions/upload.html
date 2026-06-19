@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block title %}Upload Prescription{% endblock %}
+{% block content %}
+<div class="row justify-content-center">
+<div class="col-md-5">
+<div class="card shadow-sm">
+<div class="card-body">
+    <h5 class="card-title">Upload Prescription for {{ customer.name }}</h5>
+    <form method="POST" enctype="multipart/form-data">
+        <div class="mb-3">
+            <label class="form-label">Prescription File (JPEG, PNG, PDF — max 5MB)</label>
+            <input type="file" name="prescription" class="form-control" accept=".jpg,.jpeg,.png,.pdf" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Upload</button>
+        <a href="{{ url_for('customers.profile', customer_id=customer.customer_id) }}" class="btn btn-secondary">Cancel</a>
+    </form>
+</div>
+</div>
+</div>
+</div>
+{% endblock %}
