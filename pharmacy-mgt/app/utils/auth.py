@@ -17,6 +17,6 @@ def admin_required(f):
             return redirect(url_for('auth.login'))
         if session.get('role') != 'admin':
             flash('Admin access required.', 'danger')
-            return redirect(url_for('dashboard.index'))
+            return redirect(url_for('inventory.index'))
         return f(*args, **kwargs)
     return decorated

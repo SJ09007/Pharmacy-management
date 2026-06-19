@@ -4,7 +4,7 @@ from ..database import get_db
 
 auth_bp = Blueprint('auth', __name__)
 
-@auth_bp.route('/', methods=['GET'])
+@auth_bp.route('/', methods=['GET', 'POST'])
 @auth_bp.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -17,7 +17,9 @@ def login():
             session['user_id'] = user['user_id']
             session['username'] = user['username']
             session['role'] = user['role']
-            return redirect(url_for('dashboard.index'))
+            if user['role'] == 'admin':
+                return redirect(url_for('dashboard.index'))
+            return redirect(url_for('inventory.index'))
         flash('Invalid credentials.', 'danger')
     return render_template('auth/login.html')
 
