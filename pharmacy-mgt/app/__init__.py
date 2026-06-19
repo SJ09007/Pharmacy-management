@@ -1,10 +1,11 @@
 from flask import Flask
+import os
 from flask_session import Session
 from .database import init_db
 
 def create_app():
     app = Flask(__name__, template_folder='../templates', static_folder='../static')
-    app.config['SECRET_KEY'] = 'pharmacy-secret-key-change-in-prod'
+    app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'pharmacy-dev-key')
     app.config['SESSION_TYPE'] = 'filesystem'
     app.config['UPLOAD_FOLDER'] = 'uploads/prescriptions'
     app.config['MAX_CONTENT_LENGTH'] = 5 * 1024 * 1024  # 5MB
