@@ -1,0 +1,1 @@
+Goal: "A pharmacy owner can manage inventory, prescriptions, billing and customer records digitally."
